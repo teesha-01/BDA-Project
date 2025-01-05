@@ -17,7 +17,6 @@ def generate_chunk_with_supply_chain_trends(chunk_id, chunk_size, seed, start_da
     """
     random.seed(seed + chunk_id)
     np.random.seed(seed + chunk_id)
-
     project_codes = []
     pq_numbers = []
     po_so_numbers = []
@@ -35,9 +34,25 @@ def generate_chunk_with_supply_chain_trends(chunk_id, chunk_size, seed, start_da
     sub_classifications_col = []
     vendors_col = []
     item_descriptions = []
+    molecule_brands = []
+    dosages = []
+    dosage_forms = []
+    unit_of_measure_per_pack = []
+    line_item_quantities = []
+    line_item_values = []
+    pack_prices = []
+    unit_prices = []
+    manufacturing_sites = []
+    first_line_designations = []
     weights = []
     freight_costs = []
+    line_item_insurance_costs = []
     fraud_labels = []
+    shipment_statuses = []
+    carriers = []
+    units = []
+    shipping_costs = []
+    timestamps = []
 
     delta = end_date - start_date
     for i in range(chunk_size):
@@ -58,6 +73,11 @@ def generate_chunk_with_supply_chain_trends(chunk_id, chunk_size, seed, start_da
         sub_classifications_col.append(random.choice(sub_classifications))
         vendors_col.append(random.choice(vendors))
         item_descriptions.append(f"Item-{random.randint(1, 100)}")
+        shipment_statuses.append(random.choice(["In Transit", "Delivered", "Pending", "Delayed"]))
+        carriers.append(random.choice(["DHL", "FedEx", "UPS", "BlueDart", "USPS"]))
+        units.append(random.randint(1, 500))
+        shipping_costs.append(round(random.uniform(50.0, 2000.0), 2))
+        timestamps.append(start_date + timedelta(seconds=random.randint(0, int(delta.total_seconds()))))
 
         # Dates
         random_second = random.randint(0, int(delta.total_seconds()))
@@ -101,9 +121,25 @@ def generate_chunk_with_supply_chain_trends(chunk_id, chunk_size, seed, start_da
         "Sub Classification": sub_classifications_col,
         "Vendor": vendors_col,
         "Item Description": item_descriptions,
+        "Molecule Brand": molecule_brands,
+        "Dosage": dosages,
+        "Dosage Form": dosage_forms,
+        "Unit of Measure Per Pack": unit_of_measure_per_pack,
+        "Line Item Quantity": line_item_quantities,
+        "Line Item Value": line_item_values,
+        "Pack Price": pack_prices,
+        "Unit Price": unit_prices,
+        "Manufacturing Site": manufacturing_sites,
+        "First Line Designation": first_line_designations,
         "Weight (Kg)": weights,
         "Freight Cost (USD)": freight_costs,
+        "Line Item Insurance (USD)": line_item_insurance_costs,
         "Fraud Label": fraud_labels,
+        "Shipment Status": shipment_statuses,
+        "Carrier": carriers,
+        "Units": units,
+        "Shipping Cost": shipping_costs,
+        "Timestamp": timestamps,
     }
 
     return pd.DataFrame(data)
@@ -175,5 +211,5 @@ def main():
     print(f"Data generation complete. Saved to {args.output}")
     print(f"Time taken: {elapsed:.2f} seconds")
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     main()
