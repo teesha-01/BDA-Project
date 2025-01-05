@@ -1,0 +1,14 @@
+import socket
+
+def check_connection(host, port):
+    try:
+        sock = socket.create_connection((host, port), timeout=10)
+        sock.close()
+        print(f"Connection to {host}:{port} successful!")
+    except socket.error as e:
+        print(f"Connection to {host}:{port} failed: {e}")
+
+if __name__ == "__main__":
+    kafka_host = "kafka"  # Update to the actual Kafka hostname if needed
+    kafka_port = 29092     # Kafka port
+    check_connection(kafka_host, kafka_port)
