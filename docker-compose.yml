@@ -1,6 +1,5 @@
-version: '3.8'
-
 services:
+
   zookeeper:
     image: zookeeper
     container_name: zookeeper
@@ -21,17 +20,12 @@ services:
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_LISTENER_NAME_PLAINTEXT_HOST: INSIDE
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_LISTENER_NAME_PLAINTEXT: INSIDE
-      KAFKA_LISTENER_SECURITY_PROTOCOL: PLAINTEXT
-      KAFKA_LISTENER_PORT: 9092
-      KAFKA_ADVERTISED_LISTENER_PORT: 9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
       - zookeeper
     ports:
-      - "9093:9092"
+      - "9092:9092"
       - "29092:29092"
     volumes:
       - kafka-data:/var/lib/kafka/data
@@ -48,8 +42,8 @@ services:
       - CLUSTER_NAME=test
       - DFS_REPLICATION=1
     ports:
-      - "8020:8020"
-      - "6000:50070"
+      - "8020:8020" 
+      - "6000:50070"  
     networks:
       - bda-network
 
@@ -65,7 +59,7 @@ services:
     depends_on:
       - namenode
     ports:
-      - "5000:50075"
+      - "5000:50075"  # DataNode Web UI
     networks:
       - bda-network
 
@@ -80,7 +74,7 @@ services:
       - namenode
     ports:
       - "16010:16010"
-      - "9090:9090"
+      - "9091:9090"
     networks:
       - bda-network
 
@@ -100,14 +94,11 @@ services:
     container_name: spark-master
     environment:
       - SPARK_MODE=master
-      - SPARK_MASTER_URL=spark://spark-master:7077
     ports:
-      - "7077:7077"
-      - "8080:8080"
+      - "7077:7077" 
+      - "8080:8080"  
     networks:
       - bda-network
-    volumes:
-      - ./generate-insights:/opt/spark/work-dir  # Mount local generate-insights folder into Spark
     user: root
 
   spark-worker:
@@ -119,24 +110,10 @@ services:
     depends_on:
       - spark-master
     ports:
-      - "8081:8081"
+      - "8081:8081"  # Spark worker UI
     networks:
       - bda-network
-    volumes:
-      - ./generate-insights:/opt/spark/work-dir  # Mount the folder in worker as well
     user: root
-
-  flask_app:
-    build:
-      context: ./dashboard   # Updated to point to the correct directory
-      dockerfile: Dockerfile  # Ensure the Dockerfile is inside the dashboard folder
-    container_name: flask_app
-    ports:
-      - "3001:3000"   # Mapping container's port 3000 to the host's port 3001
-    depends_on:
-      - kafka         # Make sure Kafka is started before Flask
-    networks:
-      - bda-network    
 
   x-airflow-common:
     &airflow-common
@@ -157,7 +134,7 @@ services:
     networks:
       - bda-network
     restart: "no"
-
+  
   postgres:
     image: postgres:12
     environment:
@@ -169,7 +146,7 @@ services:
       - "5432:5432"
     networks:
       - bda-network
-
+  
   airflow-init:
     << : *airflow-common
     container_name: airflow_init
@@ -216,4 +193,3 @@ volumes:
 networks:
   bda-network:
     driver: bridge
-
